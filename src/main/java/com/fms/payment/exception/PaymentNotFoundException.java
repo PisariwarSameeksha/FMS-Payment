@@ -1,7 +1,7 @@
 package com.fms.payment.exception;
 
-public class PaymentException extends Exception{
-	public PaymentException(String msg) {
+public class PaymentNotFoundException extends Exception{
+	public PaymentNotFoundException(String msg) {
 		super(msg);
 	}
 }

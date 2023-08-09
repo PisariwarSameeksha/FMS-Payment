@@ -1,23 +1,33 @@
 package com.fms.payment.service;
 
 import java.util.List;
-import com.fms.payment.entity.Payment;
-import com.fms.payment.exception.PaymentException;
+
+import com.fms.payment.DTO.PaymentDTO;
+import com.fms.payment.entity.CardPayment;
+import com.fms.payment.entity.Payment.PaymentStatus;
+import com.fms.payment.entity.UPIPayment;
+import com.fms.payment.exception.BookingNotFoundException;
+import com.fms.payment.exception.NoPaymentDoneException;
+import com.fms.payment.exception.PaymentAlreadyExistsException;
+import com.fms.payment.exception.PaymentNotFoundException;
 
 
 public interface PaymentService {
 	
-	public Payment addPayment(Payment payment)throws PaymentException;
+	public String makeCardPaymentForBooking(CardPayment card,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
+	
+	public String makeUPIPaymentForBooking(UPIPayment upi,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
 
-	public Payment getPaymentById(long paymentId)throws PaymentException;
+	public PaymentDTO getPaymentById(long paymentId)throws PaymentNotFoundException;
 	
-	public Payment getPaymentByMobileNumber(String mobileNumber)throws PaymentException;
+//	public PaymentDTO getPaymentByMobileNumber(String mobileNumber)throws PaymentNotFoundException;
 	
-	public Payment deletePayment(long paymentId)throws PaymentException;
+	public PaymentDTO getPaymentByBookingId(long bookingId) throws PaymentNotFoundException;
 	
-	public Payment updatePayment(long paymentId, Payment payment)throws PaymentException;
+	public String refundForCancelledBooking(long bookingId,PaymentStatus status) throws PaymentNotFoundException, BookingNotFoundException;
 	
-	public List<Payment> findAllPayments() throws PaymentException;
+	public String deletePayment(long paymentId)throws PaymentNotFoundException;
 	
-//	public Payment addPaymentToBooking(Payment payment,long bookingId)throws PaymentException;
+	public List<PaymentDTO> findAllPayments() throws NoPaymentDoneException;
+	
 }

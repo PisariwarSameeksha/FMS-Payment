@@ -14,20 +14,18 @@ import com.fms.payment.exception.PaymentNotFoundException;
 
 public interface PaymentService {
 	
-	public String makeCardPaymentForBooking(CardPayment card,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
+	String makeCardPaymentForBooking(CardPayment card,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
 	
-	public String makeUPIPaymentForBooking(UPIPayment upi,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
+	String makeUPIPaymentForBooking(UPIPayment upi,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
 
-	public PaymentDTO getPaymentById(long paymentId)throws PaymentNotFoundException;
+	PaymentDTO getPaymentById(long paymentId)throws PaymentNotFoundException;
 	
-//	public PaymentDTO getPaymentByMobileNumber(String mobileNumber)throws PaymentNotFoundException;
+	PaymentDTO getPaymentByBookingId(long bookingId) throws PaymentNotFoundException;
 	
-	public PaymentDTO getPaymentByBookingId(long bookingId) throws PaymentNotFoundException;
+//	String modifyPaymentByBookingId(long bookingId,PaymentDTO pay) throws PaymentNotFoundException, BookingNotFoundException;
 	
-	public String refundForCancelledBooking(long bookingId,PaymentStatus status) throws PaymentNotFoundException, BookingNotFoundException;
+	String deletePayment(long paymentId)throws PaymentNotFoundException;
 	
-	public String deletePayment(long paymentId)throws PaymentNotFoundException;
-	
-	public List<PaymentDTO> findAllPayments() throws NoPaymentDoneException;
+	List<PaymentDTO> findAllPayments() throws NoPaymentDoneException;
 	
 }

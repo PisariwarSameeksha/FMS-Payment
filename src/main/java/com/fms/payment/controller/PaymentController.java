@@ -83,25 +83,19 @@ public class PaymentController {
 	    }
 	}
 	
-//	@GetMapping("/getPaymentByMobileNumber/{mobileNumber}")
-//	ResponseEntity<PaymentDTO> getPaymentDetails3(@PathVariable String mobileNumber) throws PaymentNotFoundException {
-//		PaymentDTO paymentDTO = paymentService.getPaymentByMobileNumber(mobileNumber);
-//		return ResponseEntity.status(HttpStatus.OK).body(paymentDTO);
+//	@PutMapping("/updatePayment/{bookingId}")
+//	ResponseEntity<String> refundPayment(@PathVariable long bookingId , @RequestBody PaymentStatus status){
+//		
+//		try {
+//			logger.info("Received request to modify payment with bookingId: {}", bookingId);
+//			paymentService.refundForCancelledBooking(bookingId, status);
+//			logger.info("Payment with bookingId {} modified successfully", bookingId);
+//			return ResponseEntity.status(HttpStatus.OK).body("Updated!");
+//		}catch(PaymentNotFoundException | BookingNotFoundException e) {
+//			logger.warn("Payment with bookingId {} not found for modification", bookingId);
+//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//		}
 //	}
-	
-	@PutMapping("/updatePayment/{bookingId}")
-	ResponseEntity<String> refundPayment(@PathVariable long bookingId , @RequestBody PaymentStatus status){
-		
-		try {
-			logger.info("Received request to modify payment with bookingId: {}", bookingId);
-			paymentService.refundForCancelledBooking(bookingId, status);
-			logger.info("Payment with bookingId {} modified successfully", bookingId);
-			return ResponseEntity.status(HttpStatus.OK).body("Updated!");
-		}catch(PaymentNotFoundException | BookingNotFoundException e) {
-			logger.warn("Payment with bookingId {} not found for modification", bookingId);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}
-	}
 
 	
 	@DeleteMapping("/deletePayment/{paymentId}")

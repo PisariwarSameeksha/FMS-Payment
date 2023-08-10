@@ -11,12 +11,6 @@ import com.fms.payment.entity.Payment;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long>{
 	
-//	@Query("SELECT p FROM Payment p WHERE p.mobileNumber = :mobileNumber")
-//    Payment findByMobileNumber(String mobileNumber);
-	
-	@Query("SELECT p FROM Payment p WHERE p.bookingId = :bookingId")
-	Payment findByBookingId(long bookingId);
-	
-	void save(Optional<Payment> optPayment);
+	Optional<Payment> findByBookingId(long bookingId);
 
 }

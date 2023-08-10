@@ -155,11 +155,14 @@ public class PaymentServiceImpl implements PaymentService{
             Booking bookingDetails = response.getBody();
             if((bookingDetails!=null) && (bookingDetails.getBookingStatus()== BookingStatus.CANCELLED)) {
             	Payment payment = paymentRepository.findByBookingId(bookingId);
+            	if(payment == null) {
+            		throw new PaymentNotFoundException("Payment not done for given bookingId");
+            	}
             	payment.setStatus(status);
             	paymentRepository.save(payment);
             }
             else {
-            	throw new PaymentNotFoundException("payment not done for booking/ booking is not cancelled");
+            	throw new PaymentNotFoundException("Booking is not cancelled");
             }
 		}
 		else {

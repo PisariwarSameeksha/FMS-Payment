@@ -41,5 +41,11 @@ public class PaymentDTO {
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
+	public long getBookingId() {
+		return bookingId;
+	}
+	public void setBookingId(long bookingId) {
+		this.bookingId = bookingId;
+	}
 	
 }

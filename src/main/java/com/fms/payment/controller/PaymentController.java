@@ -99,10 +99,10 @@ public class PaymentController {
 			return ResponseEntity.status(HttpStatus.OK).body("Updated!");
 		}catch(PaymentNotFoundException | BookingNotFoundException e) {
 			logger.warn("Payment with bookingId {} not found for modification", bookingId);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payment Not Found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
-	
+
 	
 	@DeleteMapping("/deletePayment/{paymentId}")
 	ResponseEntity<String> deletePayment(@PathVariable long paymentId){
@@ -113,7 +113,7 @@ public class PaymentController {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted!");
 		}catch (PaymentNotFoundException e) {
 			logger.warn("Payment with number {} not found for removal", paymentId);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payment Not Found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 

@@ -26,11 +26,11 @@ public class Payment {
 	
 	@Enumerated(EnumType.STRING)
 	private PaymentStatus status= PaymentStatus.PENDING;
-	@NotNull
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "card_fk", referencedColumnName = "cardId")
 	private CardPayment card;
-	@NotNull
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "upi_fk", referencedColumnName = "UPIId")
 	private UPIPayment upi;
@@ -41,13 +41,12 @@ public class Payment {
 	
 	
 	public Payment() {
-		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 
-
-	public Payment(long paymentId, @NotNull String txId, @NotNull ModeOfPayment type, @NotNull PaymentStatus status,
-			CardPayment card, UPIPayment upi, @NotNull double amount) {
+	
+	public Payment(long paymentId, String txId, ModeOfPayment type, PaymentStatus status, CardPayment card,
+			UPIPayment upi, double amount, long bookingId) {
 		super();
 		this.paymentId = paymentId;
 		this.txId = txId;
@@ -56,59 +55,89 @@ public class Payment {
 		this.card = card;
 		this.upi = upi;
 		this.amount = amount;
+		this.bookingId = bookingId;
 	}
-	
+
 
 	public long getPaymentId() {
 		return paymentId;
 	}
+
+
 	public void setPaymentId(long paymentId) {
 		this.paymentId = paymentId;
 	}
+
+
 	public String getTxId() {
 		return txId;
 	}
+
+
 	public void setTxId(String txId) {
 		this.txId = txId;
 	}
+
+
 	public ModeOfPayment getType() {
 		return type;
 	}
+
+
 	public void setType(ModeOfPayment type) {
 		this.type = type;
 	}
+
+
 	public PaymentStatus getStatus() {
 		return status;
 	}
+
+
 	public void setStatus(PaymentStatus status) {
 		this.status = status;
 	}
+
+
 	public CardPayment getCard() {
 		return card;
 	}
+
+
 	public void setCard(CardPayment card) {
 		this.card = card;
 	}
+
+
 	public UPIPayment getUpi() {
 		return upi;
 	}
+
+
 	public void setUpi(UPIPayment upi) {
 		this.upi = upi;
 	}
+
+
 	public double getAmount() {
 		return amount;
 	}
+
+
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
-	
+
+
 	public long getBookingId() {
 		return bookingId;
 	}
 
+
 	public void setBookingId(long bookingId) {
 		this.bookingId = bookingId;
 	}
+
 
 	public enum ModeOfPayment{
 		SELECT,CARD,UPI

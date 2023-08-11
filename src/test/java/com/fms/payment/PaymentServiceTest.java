@@ -42,9 +42,6 @@ import com.fms.payment.service.PaymentServiceImpl;
 class PaymentServiceTest {
 
 	@Mock
-	private RestTemplate restTemplate;
-
-	@Mock
 	private PaymentRepository paymentRepository;
 
 	@InjectMocks

@@ -42,12 +42,12 @@ public class PaymentServiceImpl implements PaymentService{
 	private WebClient webclient;
 	
 	@Override
-	public String makeCardPaymentForBooking(CardPayment card, long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException {
+	public String makeCardPaymentForBooking(CardPayment card, Long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException {
 		if(paymentRepository.findByBookingId(bookingId)!=null) {
 			throw new PaymentAlreadyExistsException("Payment already done for the given booking");
 		}
 		Mono<BookingDTO> response = webclient.get()
-				.uri("http://localhost:8091/api/validateBooking/{bookingId}"+bookingId)
+				.uri("http://localhost:8091/api/booking/getBooking/{bookingId}", bookingId)
 				.accept(MediaType.APPLICATION_JSON)
 		.retrieve()
 		. bodyToMono(BookingDTO.class).log();
@@ -74,12 +74,12 @@ public class PaymentServiceImpl implements PaymentService{
 	}
 
 	@Override
-	public String makeUPIPaymentForBooking(UPIPayment upi, long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException {
+	public String makeUPIPaymentForBooking(UPIPayment upi, Long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException {
 		if(paymentRepository.findByBookingId(bookingId)!=null) {
 			throw new PaymentAlreadyExistsException("Payment already done for the given booking");
 		}
 		Mono<BookingDTO> response = webclient.get()
-				.uri("http://localhost:8091/api/validateBooking/{bookingId}"+bookingId)
+				.uri("http://localhost:8091/api/booking/getBooking/{bookingId}",bookingId)
 				.accept(MediaType.APPLICATION_JSON)
 		.retrieve()
 		. bodyToMono(BookingDTO.class).log();
@@ -104,7 +104,7 @@ public class PaymentServiceImpl implements PaymentService{
 	}
 
 	@Override
-	public PaymentDTO getPaymentById(long paymentId) throws PaymentNotFoundException {
+	public PaymentDTO getPaymentById(Long paymentId) throws PaymentNotFoundException {
 		Optional<Payment> optPayment = this.paymentRepository.findById(paymentId);
 		if(optPayment.isEmpty()) {
 			throw new PaymentNotFoundException("Payment does not exist.");
@@ -115,8 +115,8 @@ public class PaymentServiceImpl implements PaymentService{
 	}
 	
 	@Override
-	public PaymentDTO getPaymentByBookingId(long bookingId) throws PaymentNotFoundException {
-		Optional<Payment> optPayment = paymentRepository.findByBookingId(bookingId);
+	public PaymentDTO getPaymentByBookingId(Long bookingId) throws PaymentNotFoundException {
+		Optional<Payment> optPayment = Optional.ofNullable(paymentRepository.findByBookingId(bookingId));
 		if(optPayment.isEmpty()) {
 			throw new PaymentNotFoundException("Payment does not exist.");
 		}
@@ -125,36 +125,38 @@ public class PaymentServiceImpl implements PaymentService{
 		return paymentDTO;
 	}
 
-//	@Override
-//	public String modifyPaymentByBookingId(long bookingId, PaymentDTO pay) throws PaymentNotFoundException, BookingNotFoundException {
-//		Mono<BookingDTO> response = webclient.get()
-//				.uri("http://localhost:8091/api/validateBooking/{bookingId}"+bookingId)
-//				.accept(MediaType.APPLICATION_JSON)
-//		.retrieve()
-//		. bodyToMono(BookingDTO.class).log();
-//        BookingDTO bookingDetails = response.getBody();
-//        if((bookingDetails!=null) && (bookingDetails.getBookingStatus()== BookingStatus.CANCELLED)) {
-//            	Payment payment = paymentRepository.findByBookingId(bookingId);
-//            	if(payment == null) {
-//            		throw new PaymentNotFoundException("Payment not done for given bookingId");
-//            	}
-//            	payment.setStatus(status);
-//            	paymentRepository.save(payment);
-//            }
-//            else {
-//            	throw new PaymentNotFoundException("Booking is not cancelled");
-//            }
-//		}
-//		else {
-//			throw new BookingNotFoundException("booking not done for given bookingId" +bookingId);
-//		}
-//		return "Amount refunded successfully";
-//	}
+	@Override
+	public String modifyPaymentByBookingId(Long bookingId, Payment pay) throws PaymentNotFoundException, BookingNotFoundException {
+		Mono<BookingDTO> response = webclient.get()
+				.uri("http://localhost:8091/api/booking/getBooking/{bookingId}",bookingId)
+				.accept(MediaType.APPLICATION_JSON)
+		.retrieve()
+		. bodyToMono(BookingDTO.class).log();
+        BookingDTO bookingDetails = response.block();
+        if(bookingDetails == null) {
+        	throw new BookingNotFoundException("Booking not found for given BookingId" +bookingId);
+        }
+        Payment paymentToBeUpdated = this.paymentRepository.findByBookingId(bookingId);
+        if(paymentToBeUpdated == null) {
+        	throw new PaymentNotFoundException("Payment not found");
+        }
+        paymentToBeUpdated.setType(pay.getType());
+        if(pay.getType()== ModeOfPayment.CARD) {
+        	paymentToBeUpdated.setCard(pay.getCard());
+        }
+        if(pay.getType()== ModeOfPayment.UPI) {
+        	paymentToBeUpdated.setUpi(pay.getUpi());
+        }
+        paymentToBeUpdated.setAmount(bookingDetails.getTicketCost());
+        paymentToBeUpdated.setStatus(pay.getStatus());
+        this.paymentRepository.save(paymentToBeUpdated);
+        return "Payment updated successfully!";
+	}
 
 	@Override
-	public String deletePayment(long paymentId) throws PaymentNotFoundException {
-		Optional<Payment> PaymentToBeDeleted = paymentRepository.findById(paymentId);
-		if (PaymentToBeDeleted.isPresent()) {
+	public String deletePayment(Long paymentId) throws PaymentNotFoundException {
+		Optional<Payment> paymentToBeDeleted = paymentRepository.findById(paymentId);
+		if (paymentToBeDeleted.isPresent()) {
 			paymentRepository.deleteById(paymentId);
 			return "Payment deleted Successfully";
 		} else {
@@ -170,5 +172,28 @@ public class PaymentServiceImpl implements PaymentService{
 		}
 		List<PaymentDTO> paymentDTO = payments.stream().map(payment->modelMapper.map(payment,PaymentDTO.class)).collect(Collectors.toList());
 		return paymentDTO;
+	}
+
+	@Override
+	public String refundForCancelledBooking(Long bookingId) throws BookingNotFoundException, PaymentNotFoundException {
+		Payment paymentToBeUpdated = this.paymentRepository.findByBookingId(bookingId);
+        if(paymentToBeUpdated == null) {
+        	throw new PaymentNotFoundException("Payment not found");
+        }
+		Mono<BookingDTO> response = webclient.get()
+				.uri("http://localhost:8091/api/booking/getBooking/{bookingId}",bookingId)
+				.accept(MediaType.APPLICATION_JSON)
+		.retrieve()
+		. bodyToMono(BookingDTO.class).log();
+        BookingDTO bookingDetails = response.block();
+        if(bookingDetails == null) {
+			throw new BookingNotFoundException("Booking not found for bookingId"+bookingId);
+		}
+        if(bookingDetails.getBookingStatus() != BookingStatus.CANCELLED) {
+        	throw new BookingNotFoundException("Refund can be done only for cancelled booking.");
+        }
+        paymentToBeUpdated.setStatus(PaymentStatus.REFUNDED);
+        this.paymentRepository.save(paymentToBeUpdated);
+        return "Amount Refunded Successfully!";
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fms.payment.DTO.PaymentDTO;
 import com.fms.payment.entity.CardPayment;
+import com.fms.payment.entity.Payment;
 import com.fms.payment.entity.Payment.PaymentStatus;
 import com.fms.payment.entity.UPIPayment;
 import com.fms.payment.exception.BookingNotFoundException;
@@ -14,17 +15,19 @@ import com.fms.payment.exception.PaymentNotFoundException;
 
 public interface PaymentService {
 	
-	String makeCardPaymentForBooking(CardPayment card,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
+	String makeCardPaymentForBooking(CardPayment card,Long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
 	
-	String makeUPIPaymentForBooking(UPIPayment upi,long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
+	String makeUPIPaymentForBooking(UPIPayment upi,Long bookingId)throws PaymentAlreadyExistsException, BookingNotFoundException;
 
-	PaymentDTO getPaymentById(long paymentId)throws PaymentNotFoundException;
+	PaymentDTO getPaymentById(Long paymentId)throws PaymentNotFoundException;
 	
-	PaymentDTO getPaymentByBookingId(long bookingId) throws PaymentNotFoundException;
+	PaymentDTO getPaymentByBookingId(Long bookingId) throws PaymentNotFoundException;
 	
-//	String modifyPaymentByBookingId(long bookingId,PaymentDTO pay) throws PaymentNotFoundException, BookingNotFoundException;
+	String modifyPaymentByBookingId(Long bookingId,Payment pay) throws PaymentNotFoundException, BookingNotFoundException;
+
+	String refundForCancelledBooking(Long bookingId)throws BookingNotFoundException,PaymentNotFoundException;
 	
-	String deletePayment(long paymentId)throws PaymentNotFoundException;
+	String deletePayment(Long paymentId)throws PaymentNotFoundException;
 	
 	List<PaymentDTO> findAllPayments() throws NoPaymentDoneException;
 	

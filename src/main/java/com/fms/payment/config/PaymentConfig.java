@@ -12,10 +12,4 @@ public class PaymentConfig {
 		
 		return new ModelMapper();
 	}
-
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
-
 }

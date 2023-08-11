@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fms.payment.DTO.PaymentDTO;
@@ -29,6 +30,7 @@ import com.fms.payment.exception.PaymentNotFoundException;
 import com.fms.payment.service.PaymentService;
 
 @RestController
+@RequestMapping("/api/payment")
 public class PaymentController {
 	
 	@Autowired
@@ -37,7 +39,7 @@ public class PaymentController {
 	private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 	
 	@PostMapping("/makeCardPayment/{bookingId}")
-	ResponseEntity<String> addPayment(@Valid @RequestBody CardPayment card, @PathVariable long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException{
+	ResponseEntity<String> addPayment(@Valid @RequestBody CardPayment card, @PathVariable Long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException{
 		
 		logger.info("Received request to add a card payment: {}", card);
 		paymentService.makeCardPaymentForBooking(card, bookingId);
@@ -47,7 +49,7 @@ public class PaymentController {
 
 	
 	@PostMapping("/makeUPIPayment/{bookingId}")
-	ResponseEntity<String> addPayment2(@Valid @RequestBody UPIPayment upi, @PathVariable long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException{
+	ResponseEntity<String> addPayment2(@Valid @RequestBody UPIPayment upi, @PathVariable Long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException{
 		
 		logger.info("Received request to add an upi payment: {}", upi);
 		paymentService.makeUPIPaymentForBooking(upi, bookingId);
@@ -57,7 +59,7 @@ public class PaymentController {
 	
 	
 	@GetMapping("/getPaymentById/{paymentId}")
-	ResponseEntity<PaymentDTO> getPaymentDetails(@PathVariable long paymentId) {
+	ResponseEntity<PaymentDTO> getPaymentDetails(@PathVariable Long paymentId) {
 		 try {
 			 	logger.info("Received request to fetch details for payment with id: {}", paymentId);
 			 	PaymentDTO paymentDTO = paymentService.getPaymentById(paymentId);
@@ -71,7 +73,7 @@ public class PaymentController {
 	
 	
 	@GetMapping("/getPaymentByBookingId/{bookingId}")
-	ResponseEntity<PaymentDTO> getPaymentDetails2(@PathVariable long bookingId){
+	ResponseEntity<PaymentDTO> getPaymentDetails2(@PathVariable Long bookingId){
 		try {
 		 	logger.info("Received request to fetch details for payment with BookingId: {}", bookingId);
 		 	PaymentDTO paymentDTO = paymentService.getPaymentByBookingId(bookingId);
@@ -83,23 +85,23 @@ public class PaymentController {
 	    }
 	}
 	
-//	@PutMapping("/updatePayment/{bookingId}")
-//	ResponseEntity<String> refundPayment(@PathVariable long bookingId , @RequestBody PaymentStatus status){
-//		
-//		try {
-//			logger.info("Received request to modify payment with bookingId: {}", bookingId);
-//			paymentService.refundForCancelledBooking(bookingId, status);
-//			logger.info("Payment with bookingId {} modified successfully", bookingId);
-//			return ResponseEntity.status(HttpStatus.OK).body("Updated!");
-//		}catch(PaymentNotFoundException | BookingNotFoundException e) {
-//			logger.warn("Payment with bookingId {} not found for modification", bookingId);
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//		}
-//	}
+	@PutMapping("/updatePayment/{bookingId}")
+	ResponseEntity<String> updatePayment(@PathVariable Long bookingId , @RequestBody Payment pay){
+		
+		try {
+			logger.info("Received request to modify payment with bookingId: {}", bookingId);
+			paymentService.modifyPaymentByBookingId(bookingId, pay);
+			logger.info("Payment with bookingId {} modified successfully", bookingId);
+			return ResponseEntity.status(HttpStatus.OK).body("Updated!");
+		}catch(PaymentNotFoundException | BookingNotFoundException e) {
+			logger.warn("Payment with bookingId {} not found for modification", bookingId);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
 
 	
 	@DeleteMapping("/deletePayment/{paymentId}")
-	ResponseEntity<String> deletePayment(@PathVariable long paymentId){
+	ResponseEntity<String> deletePayment(@PathVariable Long paymentId){
 		try {
 			logger.info("Received request to remove payment with number: {}", paymentId);
 			paymentService.deletePayment(paymentId);
@@ -121,5 +123,17 @@ public class PaymentController {
 		return ResponseEntity.status(HttpStatus.OK).body(payments);
 	}
 	
-	
+	@PutMapping("/refundPayment/{bookingId}")
+	ResponseEntity<String> RefundPayment(@PathVariable Long bookingId ){
+		
+		try {
+			logger.info("Received request to refund payment with bookingId: {}", bookingId);
+			paymentService.refundForCancelledBooking(bookingId);
+			logger.info("Payment with bookingId {} refunded successfully", bookingId);
+			return ResponseEntity.status(HttpStatus.OK).body("Refunded!");
+		}catch(PaymentNotFoundException | BookingNotFoundException e) {
+			logger.warn("Payment with bookingId {} not found for modification", bookingId);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
 }

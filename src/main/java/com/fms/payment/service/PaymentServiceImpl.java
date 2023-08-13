@@ -93,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService{
         }
         Payment payment = new Payment();
         payment.setTxId(UUID.randomUUID().toString());
-        payment.setType(ModeOfPayment.CARD);
+        payment.setType(ModeOfPayment.UPI);
         payment.setCard(null);
         payment.setUpi(upi);
         payment.setAmount(bookingDetails.getTicketCost());

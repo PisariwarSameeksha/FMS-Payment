@@ -75,7 +75,7 @@ public class BookingDTO {
 	}
 	
 	public enum BookingStatus{
-    	CANCELLED, BOOKED
+    	BOOKED,CANCELLED
     }
 	
 }

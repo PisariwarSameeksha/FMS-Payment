@@ -2,15 +2,14 @@ package com.fms.payment.service;
 
 import java.util.List;
 
-import com.fms.payment.DTO.PaymentDTO;
 import com.fms.payment.entity.CardPayment;
 import com.fms.payment.entity.Payment;
-import com.fms.payment.entity.Payment.PaymentStatus;
 import com.fms.payment.entity.UPIPayment;
 import com.fms.payment.exception.BookingNotFoundException;
 import com.fms.payment.exception.NoPaymentDoneException;
 import com.fms.payment.exception.PaymentAlreadyExistsException;
 import com.fms.payment.exception.PaymentNotFoundException;
+import com.fms.payment.simplePojo.PaymentDTO;
 
 
 public interface PaymentService {

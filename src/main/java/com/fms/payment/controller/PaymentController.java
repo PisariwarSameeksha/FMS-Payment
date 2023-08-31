@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fms.payment.DTO.PaymentDTO;
 import com.fms.payment.entity.CardPayment;
 import com.fms.payment.entity.Payment;
 import com.fms.payment.entity.Payment.PaymentStatus;
@@ -29,6 +28,7 @@ import com.fms.payment.exception.NoPaymentDoneException;
 import com.fms.payment.exception.PaymentAlreadyExistsException;
 import com.fms.payment.exception.PaymentNotFoundException;
 import com.fms.payment.service.PaymentService;
+import com.fms.payment.simplePojo.PaymentDTO;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -42,7 +42,7 @@ public class PaymentController {
 	
 	@PostMapping("/makeCardPayment/{bookingId}")
 	ResponseEntity<String> addPayment(@Valid @RequestBody CardPayment card, @PathVariable Long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException{
-		
+	
 		logger.info("Received request to add a card payment: {}", card);
 		paymentService.makeCardPaymentForBooking(card, bookingId);
 		logger.info("Card payment added to given booking: {}", card);
@@ -59,7 +59,7 @@ public class PaymentController {
 		return ResponseEntity.status(HttpStatus.CREATED).body("Payment done!");
 	}
 	
-	
+
 	@GetMapping("/getPaymentById/{paymentId}")
 	ResponseEntity<PaymentDTO> getPaymentDetails(@PathVariable Long paymentId) {
 		 try {
@@ -86,7 +86,7 @@ public class PaymentController {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	    }
 	}
-	
+
 	@PutMapping("/updatePayment/{bookingId}")
 	ResponseEntity<String> updatePayment(@PathVariable Long bookingId , @RequestBody Payment pay){
 		

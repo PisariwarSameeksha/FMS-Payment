@@ -22,7 +22,7 @@ public class PaymentControllerAdvice {
     public ResponseEntity<String> BookingException(BookingNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
-	
+
 	@ExceptionHandler(NoPaymentDoneException.class)
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	public String handleNoPaymentDoneException(Exception e) {

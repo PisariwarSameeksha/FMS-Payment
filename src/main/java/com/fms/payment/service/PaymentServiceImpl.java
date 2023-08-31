@@ -7,15 +7,10 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.fms.payment.DTO.BookingDTO;
-import com.fms.payment.DTO.BookingDTO.BookingStatus;
-import com.fms.payment.DTO.PaymentDTO;
+
 import com.fms.payment.dao.PaymentRepository;
 import com.fms.payment.entity.CardPayment;
 import com.fms.payment.entity.Payment;
@@ -26,6 +21,9 @@ import com.fms.payment.exception.BookingNotFoundException;
 import com.fms.payment.exception.NoPaymentDoneException;
 import com.fms.payment.exception.PaymentAlreadyExistsException;
 import com.fms.payment.exception.PaymentNotFoundException;
+import com.fms.payment.simplePojo.BookingDTO;
+import com.fms.payment.simplePojo.PaymentDTO;
+import com.fms.payment.simplePojo.BookingDTO.BookingStatus;
 
 import reactor.core.publisher.Mono;
 
@@ -53,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService{
 		. bodyToMono(BookingDTO.class).log();
 		
 		BookingDTO bookingDetails = response.block();
-		
+	
 		if(bookingDetails == null) {
 			throw new BookingNotFoundException("Booking not found for bookingId"+bookingId);
 		}
@@ -72,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService{
         paymentRepository.save(payment);
 		return "Payment done successfully!";
 	}
-
+	
 	@Override
 	public String makeUPIPaymentForBooking(UPIPayment upi, Long bookingId) throws PaymentAlreadyExistsException, BookingNotFoundException {
 		if(paymentRepository.findByBookingId(bookingId)!=null) {

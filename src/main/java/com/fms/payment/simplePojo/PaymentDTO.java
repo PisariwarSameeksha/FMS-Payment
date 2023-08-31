@@ -1,4 +1,4 @@
-package com.fms.payment.DTO;
+package com.fms.payment.simplePojo;
 
 import com.fms.payment.entity.Payment.ModeOfPayment;
 import com.fms.payment.entity.Payment.PaymentStatus;

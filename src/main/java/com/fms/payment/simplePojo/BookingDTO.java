@@ -1,4 +1,4 @@
-package com.fms.payment.DTO;
+package com.fms.payment.simplePojo;
 
 import java.time.LocalDate;
 

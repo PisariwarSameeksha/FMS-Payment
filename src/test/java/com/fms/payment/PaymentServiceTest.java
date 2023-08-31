@@ -1,13 +1,9 @@
 package com.fms.payment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -22,22 +18,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-import com.fms.payment.DTO.PaymentDTO;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import com.fms.payment.dao.PaymentRepository;
 import com.fms.payment.entity.CardPayment;
 import com.fms.payment.entity.Payment;
-import com.fms.payment.entity.Payment.ModeOfPayment;
-import com.fms.payment.entity.Payment.PaymentStatus;
-import com.fms.payment.entity.UPIPayment;
-import com.fms.payment.exception.BookingNotFoundException;
 import com.fms.payment.exception.NoPaymentDoneException;
 import com.fms.payment.exception.PaymentAlreadyExistsException;
 import com.fms.payment.exception.PaymentNotFoundException;
 import com.fms.payment.service.PaymentServiceImpl;
+import com.fms.payment.simplePojo.PaymentDTO;
 
 class PaymentServiceTest {
 
@@ -59,80 +49,24 @@ class PaymentServiceTest {
 		Mockito.reset(paymentRepository, modelMapper);
 	}
 	
-//	@Test
-//	void testMakeCardPaymentForBooking_Success() throws PaymentAlreadyExistsException, BookingNotFoundException {
-//		long bookingId = 12345;
-//		Booking validBooking = new Booking();
-//		validBooking.setBookingId(bookingId);
-//		validBooking.setBookingStatus(BookingStatus.BOOKED);
-//		validBooking.setTicketCost(100.0);
-//
-//		ResponseEntity<Booking> validBookingResponse = new ResponseEntity<>(validBooking, HttpStatus.OK);
-//		Mockito.when(restTemplate.exchange(Mockito.anyString(), Mockito.eq(HttpMethod.GET), Mockito.isNull(),
-//				Mockito.eq(Booking.class), Mockito.eq(bookingId))).thenReturn(validBookingResponse);
-//
-//		CardPayment card = new CardPayment();
-//		String result = paymentService.makeCardPaymentForBooking(card, bookingId);
-//
-//		Mockito.verify(paymentRepository, Mockito.times(1)).save(Mockito.any(Payment.class));
-//		assertEquals("Payment done successfully!", result);
-//	
-//	}
-//	
-//	@Test
-//    void testMakeCardPaymentForBooking_BookingNotFound() throws BookingNotFoundException {
-//        long bookingId = 1L;
-//
-//        when(restTemplate.exchange(
-//                anyString(),
-//                any(),
-//                any(),
-//                eq(Booking.class),
-//                eq(bookingId)
-//        )).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//
-//        assertThrows(BookingNotFoundException.class, () -> {
-//            paymentService.makeCardPaymentForBooking(new CardPayment(), bookingId);
-//        });
-//    }
-//
-//	@Test
-//	void testMakeUPIPaymentForBooking_Success() throws PaymentAlreadyExistsException, BookingNotFoundException {
-//		long bookingId = 12345;
-//		Booking validBooking = new Booking();
-//		validBooking.setBookingId(bookingId);
-//		validBooking.setBookingStatus(BookingStatus.BOOKED);
-//		validBooking.setTicketCost(100.0);
-//
-//		ResponseEntity<Booking> validBookingResponse = new ResponseEntity<>(validBooking, HttpStatus.OK);
-//		Mockito.when(restTemplate.exchange(Mockito.anyString(), Mockito.eq(HttpMethod.GET), Mockito.isNull(),
-//				Mockito.eq(Booking.class), Mockito.eq(bookingId))).thenReturn(validBookingResponse);
-//
-//		UPIPayment upi = new UPIPayment();
-//		String result = paymentService.makeUPIPaymentForBooking(upi, bookingId);
-//
-//		Mockito.verify(paymentRepository, Mockito.times(1)).save(Mockito.any(Payment.class));
-//		assertEquals("Payment done successfully!", result);
-//		
-//	}
-//	
-//	@Test
-//    void testMakeUPIPaymentForBooking_BookingNotFound() throws BookingNotFoundException {
-//        long bookingId = 1L;
-//
-//        when(restTemplate.exchange(
-//                anyString(),
-//                any(),
-//                any(),
-//                eq(Booking.class),
-//                eq(bookingId)
-//        )).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//
-//        assertThrows(BookingNotFoundException.class, () -> {
-//            paymentService.makeUPIPaymentForBooking(new UPIPayment(), bookingId);
-//        });
-//    }
-//    
+	@Mock
+	private WebClient webclient;
+	
+    @Test
+    public void testMakeCardPaymentForBooking_PaymentAlreadyExistsException() {
+        // Prepare test data
+        CardPayment cardPayment = new CardPayment();
+        Long bookingId = 123L;
+
+        when(paymentRepository.findByBookingId(bookingId)).thenReturn(new Payment());
+
+        
+        assertThrows(PaymentAlreadyExistsException.class, () -> {
+            paymentService.makeCardPaymentForBooking(cardPayment, bookingId);
+        });
+    }
+    
+
 	@Test
 	void testDeletePayment_Success() throws PaymentNotFoundException {
 		long paymentId = 123L;
